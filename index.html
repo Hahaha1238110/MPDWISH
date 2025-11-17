@@ -81,7 +81,7 @@
       text-align: left;
       border: 1px solid #ddd;
       word-wrap: break-word;
-      white-space: pre-wrap; /* preserves line breaks */
+      white-space: pre-wrap;
       vertical-align: top;
     }
 
@@ -94,7 +94,6 @@
       background-color: #f9f9f9;
     }
 
-    /* Number column styling */
     th.Number, td.Number {
       width: 60px;
       text-align: center;
@@ -104,7 +103,6 @@
       text-overflow: ellipsis;
     }
 
-    /* Date/Time column styling */
     th.date-time, td.date-time {
       width: 140px;
       font-size: 12px;
@@ -148,17 +146,26 @@
   </table>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getDatabase, ref, set, get, push } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    // New Firebase v12 imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+    import { getDatabase, ref, set, push, get } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
+    // Your Firebase config (from your previous script)
     const firebaseConfig = {
-      apiKey: "AIzaSyAHZbilFupWzHDpovfLwS_UkeozIqrGaUs",
+      apiKey: "AIzaSyCQYD_TOF-Voa9m0AYS66zDrW9a4LSlS3k",
       authDomain: "wishlist-a9da8.firebaseapp.com",
       databaseURL: "https://wishlist-a9da8-default-rtdb.firebaseio.com",
-      projectId: "wishlist-a9da8"
+      projectId: "wishlist-a9da8",
+      storageBucket: "wishlist-a9da8.firebasestorage.app",
+      messagingSenderId: "410486011886",
+      appId: "1:410486011886:web:d1cd49468db8df3a7940ff",
+      measurementId: "G-2NHV36GTK9"
     };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const db = getDatabase(app);
 
     // Save wishlist to Firebase
@@ -222,4 +229,3 @@
 
 </body>
 </html>
-
