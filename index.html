@@ -144,16 +144,17 @@
     <tbody id="wishlistsContainer"></tbody>
   </table>
 
+  <!-- Firebase script at the end of body -->
   <script type="module">
-    // Firebase v12 imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
     import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
-    // Firebase config (mpdwish)
+    // Firebase config with your Realtime Database URL
     const firebaseConfig = {
       apiKey: "AIzaSyB1LyEWBLqJ0awITfLYThWZIkMyBoRnlHk",
       authDomain: "mpdwish.firebaseapp.com",
+      databaseURL: "https://mpdwish-default-rtdb.firebaseio.com/", // <--- Database URL here
       projectId: "mpdwish",
       storageBucket: "mpdwish.firebasestorage.app",
       messagingSenderId: "495928837658",
