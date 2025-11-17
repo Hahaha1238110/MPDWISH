@@ -109,7 +109,6 @@
       color: #555;
       white-space: normal;
     }
-
   </style>
 </head>
 <body>
@@ -146,27 +145,27 @@
   </table>
 
   <script type="module">
-    // New Firebase v12 imports
+    // Firebase v12 imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-    import { getDatabase, ref, set, push, get } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
-    // Your Firebase config (from your previous script)
+    // Firebase config (mpdwish)
     const firebaseConfig = {
-      apiKey: "AIzaSyCQYD_TOF-Voa9m0AYS66zDrW9a4LSlS3k",
-      authDomain: "wishlist-a9da8.firebaseapp.com",
-      databaseURL: "https://wishlist-a9da8-default-rtdb.firebaseio.com",
-      projectId: "wishlist-a9da8",
-      storageBucket: "wishlist-a9da8.firebasestorage.app",
-      messagingSenderId: "410486011886",
-      appId: "1:410486011886:web:d1cd49468db8df3a7940ff",
-      measurementId: "G-2NHV36GTK9"
+      apiKey: "AIzaSyB1LyEWBLqJ0awITfLYThWZIkMyBoRnlHk",
+      authDomain: "mpdwish.firebaseapp.com",
+      projectId: "mpdwish",
+      storageBucket: "mpdwish.firebasestorage.app",
+      messagingSenderId: "495928837658",
+      appId: "1:495928837658:web:4e27b376757e260fd773a3",
+      measurementId: "G-1VHJZDW68Q"
     };
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getDatabase(app);
+    const wishlistRef = ref(db, 'wishlists');
 
     // Save wishlist to Firebase
     window.saveWishlist = function saveWishlist() {
@@ -184,12 +183,10 @@
         };
         const formattedDate = now.toLocaleString('en-PH', options).replace(',', '');
 
-        const wishlistRef = ref(db, 'wishlists');
         push(wishlistRef, { name, wish1, wish2, wish3, timestamp: formattedDate })
           .then(() => {
             alert("Wishlist saved!");
             document.getElementById("wishlistForm").reset();
-            loadWishlists();
           })
           .catch(error => console.error("Error writing data:", error));
       } else {
@@ -197,34 +194,27 @@
       }
     };
 
-    // Load wishlists from Firebase
-    function loadWishlists() {
-      const wishlistsRef = ref(db, 'wishlists');
-      get(wishlistsRef)
-        .then(snapshot => {
-          const container = document.getElementById("wishlistsContainer");
-          container.innerHTML = "";
-          if (snapshot.exists()) {
-            const data = snapshot.val();
-            for (const key in data) {
-              const item = data[key];
-              container.innerHTML += `
-                <tr>
-                  <td class="Number">${item.name}</td>
-                  <td>${item.wish1.replace(/\n/g, '<br>')}</td>
-                  <td>${item.wish2.replace(/\n/g, '<br>')}</td>
-                  <td>${item.wish3.replace(/\n/g, '<br>')}</td>
-                  <td class="date-time">${item.timestamp || "N/A"}</td>
-                </tr>`;
-            }
-          } else {
-            container.innerHTML = "<tr><td colspan='5'>No wishlists found.</td></tr>";
-          }
-        })
-        .catch(error => console.error("Error reading data:", error));
-    }
-
-    window.onload = loadWishlists;
+    // Real-time listener for automatic updates
+    onValue(wishlistRef, (snapshot) => {
+      const container = document.getElementById("wishlistsContainer");
+      container.innerHTML = "";
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        for (const key in data) {
+          const item = data[key];
+          container.innerHTML += `
+            <tr>
+              <td class="Number">${item.name}</td>
+              <td>${item.wish1.replace(/\n/g, '<br>')}</td>
+              <td>${item.wish2.replace(/\n/g, '<br>')}</td>
+              <td>${item.wish3.replace(/\n/g, '<br>')}</td>
+              <td class="date-time">${item.timestamp || "N/A"}</td>
+            </tr>`;
+        }
+      } else {
+        container.innerHTML = "<tr><td colspan='5'>No wishlists found.</td></tr>";
+      }
+    });
   </script>
 
 </body>
