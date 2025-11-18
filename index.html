@@ -17,7 +17,11 @@ table { width:90%; margin:20px auto; border-collapse:collapse; background:#fff; 
 th, td { padding:10px; border:1px solid #ddd; text-align:left; vertical-align:top; white-space:pre-wrap; word-wrap:break-word; }
 th { background:#f4f4f4; font-weight:bold; }
 tr:nth-child(even) { background:#f9f9f9; }
-th.Number, td.Number { width:60px; text-align:center; vertical-align:middle; }
+th.CodeName, td.CodeName { 
+  width: 180px; /* increased width for Code Name column */
+  text-align: center; 
+  vertical-align: middle; 
+}
 th.date-time, td.date-time { width:140px; font-size:12px; color:#555; }
 </style>
 </head>
@@ -25,8 +29,8 @@ th.date-time, td.date-time { width:140px; font-size:12px; color:#555; }
 
 <h1>Submit Your Wishlist</h1>
 <form id="wishlistForm">
-  <label for="Number">Code Name:</label>
-  <input type="text" id="Number" placeholder="Enter your code name" required>
+  <label for="CodeName">Code Name:</label>
+  <input type="text" id="CodeName" placeholder="Enter your code name" required>
 
   <label for="wish1">Wish 1:</label>
   <textarea id="wish1" placeholder="Enter your first wish" required></textarea>
@@ -44,7 +48,7 @@ th.date-time, td.date-time { width:140px; font-size:12px; color:#555; }
 <table>
   <thead>
     <tr>
-      <th class="Number">Number</th>
+      <th class="CodeName">Code Name</th>
       <th>Wish 1</th>
       <th>Wish 2</th>
       <th>Wish 3</th>
@@ -80,12 +84,12 @@ const form = document.getElementById("wishlistForm");
 form.addEventListener("submit", e => {
   e.preventDefault();
 
-  const name = document.getElementById("Number").value.trim();
+  const codeName = document.getElementById("CodeName").value.trim();
   const wish1 = document.getElementById("wish1").value.trim();
   const wish2 = document.getElementById("wish2").value.trim();
   const wish3 = document.getElementById("wish3").value.trim();
 
-  if (!name || !wish1 || !wish2 || !wish3) {
+  if (!codeName || !wish1 || !wish2 || !wish3) {
     alert("Fill all fields!");
     return;
   }
@@ -96,7 +100,7 @@ form.addEventListener("submit", e => {
     timeZone:"Asia/Manila" 
   });
 
-  push(wishlistRef, { name, wish1, wish2, wish3, timestamp })
+  push(wishlistRef, { codeName, wish1, wish2, wish3, timestamp })
     .then(() => form.reset())
     .catch(err => alert("Error saving: "+err));
 });
@@ -114,7 +118,7 @@ onValue(wishlistRef, snapshot => {
     const item = data[key];
     container.innerHTML += `
       <tr>
-        <td class="Number">${item.name}</td>
+        <td class="CodeName">${item.codeName}</td>
         <td>${item.wish1.replace(/\n/g,"<br>")}</td>
         <td>${item.wish2.replace(/\n/g,"<br>")}</td>
         <td>${item.wish3.replace(/\n/g,"<br>")}</td>
@@ -126,4 +130,3 @@ onValue(wishlistRef, snapshot => {
 
 </body>
 </html>
-
