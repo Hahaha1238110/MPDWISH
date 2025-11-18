@@ -115,8 +115,8 @@
 
   <h1>Submit Your Wishlist</h1>
   <form id="wishlistForm" onsubmit="event.preventDefault(); saveWishlist();">
-    <label for="Number">Number (1-9):</label>
-    <input type="text" id="Number" placeholder="Enter 1-9" maxlength="1" pattern="[0-9]" title="Enter a number from 1 to 9" required>
+    <label for="Number">Number:</label>
+    <input type="text" id="Number" placeholder="Enter anything" required>
 
     <label for="wish1">Wish 1:</label>
     <textarea id="wish1" placeholder="Enter your first wish" required></textarea>
@@ -144,17 +144,15 @@
     <tbody id="wishlistsContainer"></tbody>
   </table>
 
-  <!-- Firebase script at the end of body -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
     import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
-    // Firebase config with your Realtime Database URL
     const firebaseConfig = {
       apiKey: "AIzaSyB1LyEWBLqJ0awITfLYThWZIkMyBoRnlHk",
       authDomain: "mpdwish.firebaseapp.com",
-      databaseURL: "https://mpdwish-default-rtdb.firebaseio.com/", // <--- Database URL here
+      databaseURL: "https://mpdwish-default-rtdb.firebaseio.com/",
       projectId: "mpdwish",
       storageBucket: "mpdwish.firebasestorage.app",
       messagingSenderId: "495928837658",
@@ -162,13 +160,11 @@
       measurementId: "G-1VHJZDW68Q"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getDatabase(app);
     const wishlistRef = ref(db, 'wishlists');
 
-    // Save wishlist to Firebase
     window.saveWishlist = function saveWishlist() {
       const name = document.getElementById("Number").value.trim();
       const wish1 = document.getElementById("wish1").value.trim();
@@ -182,6 +178,7 @@
           hour: '2-digit', minute: '2-digit', hour12: true, 
           timeZone: 'Asia/Manila' 
         };
+
         const formattedDate = now.toLocaleString('en-PH', options).replace(',', '');
 
         push(wishlistRef, { name, wish1, wish2, wish3, timestamp: formattedDate })
@@ -195,7 +192,6 @@
       }
     };
 
-    // Real-time listener for automatic updates
     onValue(wishlistRef, (snapshot) => {
       const container = document.getElementById("wishlistsContainer");
       container.innerHTML = "";
