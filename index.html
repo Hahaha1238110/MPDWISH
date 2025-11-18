@@ -7,214 +7,112 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
-      margin: 0;
+      background: #f9f9f9;
       padding: 20px;
-      text-align: center;
     }
-
-    h1, h2 {
-      color: #555;
+    h2 {
+      margin-bottom: 10px;
     }
-
-    form {
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
+    input {
+      padding: 8px;
+      width: 200px;
+      margin-right: 5px;
     }
-
-    label {
-      display: block;
-      font-size: 16px;
-      margin-bottom: 8px;
-      text-align: left;
-    }
-
-    input[type="text"], textarea {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-sizing: border-box;
-    }
-
-    input[type="text"] {
-      text-align: center;
-    }
-
-    textarea {
-      height: 100px;
-      resize: vertical;
-    }
-
     button {
-      padding: 10px 20px;
-      font-size: 16px;
-      color: #fff;
-      background-color: #28a745;
-      border: none;
-      border-radius: 5px;
+      padding: 8px 12px;
       cursor: pointer;
     }
-
-    button:hover {
-      background-color: #218838;
-    }
-
     table {
-      width: 90%;
-      margin: 20px auto;
+      width: 100%;
+      margin-top: 20px;
       border-collapse: collapse;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      background: #fff;
     }
-
     th, td {
       padding: 10px;
-      text-align: left;
       border: 1px solid #ddd;
-      word-wrap: break-word;
-      white-space: pre-wrap;
-      vertical-align: top;
+      text-align: left;
     }
-
-    th {
-      background-color: #f4f4f4;
-      font-weight: bold;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
-    th.Number, td.Number {
-      width: 80px;
+    .empty {
       text-align: center;
-    }
-
-    th.date-time, td.date-time {
-      width: 150px;
-      font-size: 12px;
-      color: #555;
+      padding: 20px;
+      color: gray;
     }
   </style>
 </head>
 <body>
 
-  <h1>Submit Your Wishlist</h1>
+  <h2>My Wishlist</h2>
 
-  <form id="wishlistForm" onsubmit="event.preventDefault(); saveWishlist();">
-    
-    <label for="Number">Number:</label>
-    <input type="text" id="Number" placeholder="Enter any text" required>
+  <input type="text" id="wishInput" placeholder="Enter wish">
+  <button onclick="addWish()">Add</button>
 
-    <label for="wish1">Wish 1:</label>
-    <textarea id="wish1" required></textarea>
-
-    <label for="wish2">Wish 2:</label>
-    <textarea id="wish2" required></textarea>
-
-    <label for="wish3">Wish 3:</label>
-    <textarea id="wish3" required></textarea>
-
-    <button type="submit">Add Wishlist</button>
-  </form>
-
-  <h2>All Wishlists:</h2>
-
-  <table>
+  <table id="wishTable">
     <thead>
       <tr>
-        <th class="Number">Number</th>
-        <th>Wish 1</th>
-        <th>Wish 2</th>
-        <th>Wish 3</th>
-        <th class="date-time">Date & Time</th>
+        <th>Wish</th>
+        <th>Action</th>
       </tr>
     </thead>
-    <tbody id="wishlistsContainer"></tbody>
+    <tbody id="wishBody">
+      <!-- Dynamic rows go here -->
+    </tbody>
   </table>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+<script>
+  // Load wishlist from localStorage
+  let wishes = JSON.parse(localStorage.getItem("wishes")) || [];
 
-    // Fixed Firebase Config (NO trailing slash /)
-    const firebaseConfig = {
-      apiKey: "AIzaSyB1LyEWBLqJ0awITfLYThWZIkMyBoRnlHk",
-      authDomain: "mpdwish.firebaseapp.com",
-      databaseURL: "https://mpdwish-default-rtdb.firebaseio.com",
-      projectId: "mpdwish",
-      storageBucket: "mpdwish.firebasestorage.app",
-      messagingSenderId: "495928837658",
-      appId: "1:495928837658:web:4e27b376757e260fd773a3"
-    };
+  // Display the wishlist items
+  function renderTable() {
+    const body = document.getElementById("wishBody");
+    body.innerHTML = "";
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const wishlistRef = ref(db, "wishlists");
+    if (wishes.length === 0) {
+      body.innerHTML = `<tr><td colspan="2" class="empty">No items in wishlist</td></tr>`;
+      return;
+    }
 
-    // Save to Firebase
-    window.saveWishlist = function () {
-      const name = document.getElementById("Number").value.trim();
-      const wish1 = document.getElementById("wish1").value.trim();
-      const wish2 = document.getElementById("wish2").value.trim();
-      const wish3 = document.getElementById("wish3").value.trim();
-
-      if (!name || !wish1 || !wish2 || !wish3) {
-        alert("Please fill in all fields!");
-        return;
-      }
-
-      const now = new Date();
-      const options = { 
-        day: '2-digit', month: 'short', year: 'numeric', 
-        hour: '2-digit', minute: '2-digit', hour12: true,
-        timeZone: 'Asia/Manila' 
-      };
-      const formattedDate = now.toLocaleString('en-PH', options).replace(",", "");
-
-      push(wishlistRef, { name, wish1, wish2, wish3, timestamp: formattedDate })
-        .then(() => {
-          alert("Wishlist saved!");
-          document.getElementById("wishlistForm").reset();
-        })
-        .catch(err => console.error("Error saving:", err));
-    };
-
-    // Load data real-time
-    onValue(wishlistRef, (snapshot) => {
-      const container = document.getElementById("wishlistsContainer");
-      container.innerHTML = "";
-
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        for (const key in data) {
-          const item = data[key];
-          container.innerHTML += `
-            <tr>
-              <td class="Number">${item.name}</td>
-              <td>${item.wish1.replace(/\n/g, "<br>")}</td>
-              <td>${item.wish2.replace(/\n/g, "<br>")}</td>
-              <td>${item.wish3.replace(/\n/g, "<br>")}</td>
-              <td class="date-time">${item.timestamp}</td>
-            </tr>
-          `;
-        }
-      } else {
-        container.innerHTML = "<tr><td colspan='5'>No wishlists found.</td></tr>";
-      }
+    wishes.forEach((wish, index) => {
+      body.innerHTML += `
+        <tr>
+          <td>${wish}</td>
+          <td><button onclick="deleteWish(${index})">Delete</button></td>
+        </tr>
+      `;
     });
+  }
 
-  </script>
+  // Add a wish
+  function addWish() {
+    const input = document.getElementById("wishInput");
+    const text = input.value.trim();
+
+    if (!text) {
+      alert("Please enter a wish.");
+      return;
+    }
+
+    wishes.push(text);
+    input.value = "";
+    saveAndUpdate();
+  }
+
+  // Delete a wish
+  function deleteWish(index) {
+    wishes.splice(index, 1);
+    saveAndUpdate();
+  }
+
+  // Save to localStorage and refresh table
+  function saveAndUpdate() {
+    localStorage.setItem("wishes", JSON.stringify(wishes));
+    renderTable();
+  }
+
+  // Initial display
+  renderTable();
+</script>
 
 </body>
 </html>
